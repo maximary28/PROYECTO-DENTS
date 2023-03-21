@@ -1,0 +1,57 @@
+@page "/rol/crear"
+@page "/rol/editar/{Id:int}"
+<EditForm Model="@Rol" OnValidSubmit="Send">
+<h1>@Titulo</h1>
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div class="form-group">
+        <label>Nombre:</label>
+        <InputText class="form-control" @bind-Value="Rol.Nombre"></InputText>
+    </div>
+    <div>
+        <InputCheckbox id="chkCrear"  @bind-Value="Rol.PermisoParaCrear"></InputCheckbox>
+        <label for="chkCrear">Permiso Para Crear</label>
+    </div>
+    <div>
+        <InputCheckbox id="chkEditar"@bind-Value="Rol.PermisoParaEditar"></InputCheckbox>
+        <label for="chkEditar">Permiso Para Editar</label>
+    </div>
+    <div>
+        <InputCheckbox id="chkEliminar" @bind-Value="Rol.PermisoParaEliminar"></InputCheckbox>
+        <label for="chkEliminar">Permiso Para Eliminar</label>
+    </div>
+    
+    
+    
+    <button type="submit" class="mt-2 btn btn-success  btn-with-margin">Ok</button>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+    public string Titulo => Id>0? "Editar rol":"Crear rol";
+
+    public UsuarioRolUpdateRequest Rol { get; set; } = new UsuarioRolUpdateRequest();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(Id!=0){
+            var resultado = await rolesManager.GetByIdAsync(Id);
+            if(resultado.Succeeded){
+                Rol.Id = resultado.Data.Id;
+                Rol.PermisoParaCrear = resultado.Data.PermisoParaCrear;
+                Rol.PermisoParaEditar = resultado.Data.PermisoParaEditar;
+                Rol.PermisoParaEliminar = resultado.Data.PermisoParaEliminar;
+                StateHasChanged();
+            }
+        }
+    }
+            
+    public async void Send()
+    {
+        var resultado = await rolesManager.CreateAsync(Rol);
+        if(resultado.Succeeded) urlHelper.NavigateTo("/roles");
+    }
+}

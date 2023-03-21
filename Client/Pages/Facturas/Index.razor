@@ -1,0 +1,40 @@
+@page "/facturas"
+<h1>Facturas</h1>
+<button @onclick="Agregar" class="btn btn-success" style="margin-bottom: 5px;">Agregar</button>
+@if(Facturas != null)
+{
+    <ul>
+        @foreach (var factura in Facturas)
+        {
+            <li>@factura.Id</li>
+            <button class="btn btn-outline-warning" @onclick="()=>Editar(factura.Id)">Editar</button>
+        }
+    </ul>
+}
+else
+{
+    <p>Cargando...</p>
+}
+
+@code
+{
+    public List<FacturaRecord>? Facturas { get; set; }
+    
+        protected override async Task OnInitializedAsync()
+        {
+            var response = await facturasManager.GetAsync();
+            if(response.Succeeded){
+                Facturas = response.Items.ToList();
+            }
+        }
+    public void Agregar()
+    {
+        urlHelper.NavigateTo("/factura/crear",false);
+    }
+
+    public void Editar(int Id)
+    {
+        urlHelper.NavigateTo($"/factura/editar/{Id}",false);
+    }
+}
+

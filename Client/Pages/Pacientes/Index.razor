@@ -1,0 +1,41 @@
+@page "/pacientes"
+<h1>Pacientes</h1>
+<button @onclick="Agregar" class="btn btn-success" style="margin-bottom: 5px;">Agregar</button>
+@if(Pacientes != null)
+{
+    <ul>
+        @foreach (var paciente in Pacientes)
+        {
+            <li>@paciente.Nombre</li>
+            <button class="btn btn-outline-warning" @onclick="()=>Editar(paciente.Id)">Editar</button>
+        }
+    </ul>
+}
+else
+{
+    <p>Cargando...</p>
+}
+
+@code
+{
+    public List<PacienteRecord>? Pacientes { get; set; }
+    
+        protected override async Task OnInitializedAsync()
+        {
+            var response = await pacientesManager.GetAsync();
+            if(response.Succeeded){
+                Pacientes = response.Items.ToList();
+            }
+        }
+
+    public void Agregar()
+    {
+        urlHelper.NavigateTo("/paciente/crear",false);
+    }
+
+    public void Editar(int Id)
+    {
+        urlHelper.NavigateTo($"/paciente/editar/{Id}",false);
+    }
+}
+

@@ -1,0 +1,42 @@
+@page "/citas"
+<h1>Citas</h1>
+<button @onclick="Agregar" class="btn btn-success" style="margin-bottom: 5px;">Agregar</button>
+@if(Citas != null)
+{
+    <ul>
+        @foreach (var cita in Citas)
+        {
+            <li>Nombre Paciente: @cita.Paciente.Nombre</li>
+            <li>Fecha: @cita.Fecha</li>
+            <button class="btn btn-outline-warning" @onclick="()=>Editar(cita.Id)">Editar</button>
+        }
+    </ul>
+}
+else
+{
+    <p>Cargando...</p>
+}
+
+@code
+{
+    public List<CitaRecord>? Citas { get; set; }
+    
+        protected override async Task OnInitializedAsync()
+        {
+            var response = await citasManager.GetAsync();
+            if(response.Succeeded){
+                Citas = response.Items.ToList();
+            }
+        }
+
+    public void Agregar()
+    {
+        urlHelper.NavigateTo("/cita/crear",false);
+    }
+
+    public void Editar(int Id)
+    {
+        urlHelper.NavigateTo($"/cita/editar/{Id}",false);
+    }
+}
+

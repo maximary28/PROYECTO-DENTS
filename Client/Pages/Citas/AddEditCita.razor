@@ -1,0 +1,62 @@
+@page "/cita/crear"
+@page "/cita/editar/{Id:int}"
+<EditForm Model="@Cita" OnValidSubmit="Send">
+<h1>@Titulo</h1>
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div class="form-group">
+        <label>Paciente:</label>
+        <InputNumber class="form-control" @bind-Value="Cita.PacienteId"></InputNumber>
+    </div>
+    <div class="form-group">
+        <label>Fecha:</label>
+        <InputDate class="form-control" @bind-Value="Cita.Fecha"/>
+    </div>
+    <div class="form-group">
+        <label>Tratamiento: </label>
+        <InputNumber class="form-control" @bind-Value="Cita.TratamientoId"/>
+    </div>
+    <div class="form-group">
+        <label>Proxima Cita: </label>
+        <InputDate class="form-control" @bind-Value="Cita.ProximaCita"/>
+    </div>
+    <div class="form-group">
+        <label>Observaciones: </label>
+        <InputText class="form-control" @bind-Value="Cita.Observaciones"/>
+    </div>
+    
+    
+    <button type="submit" class="mt-2 btn btn-success  btn-with-margin">Ok</button>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+    public string Titulo => Id>0? "Editar cita":"Crear cita";
+
+    public CitaUpdateRequest Cita { get; set; } = new CitaUpdateRequest();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(Id!=0){
+            var resultado = await citasManager.GetByIdAsync(Id);
+            if(resultado.Succeeded){
+                Cita.Id = resultado.Data.Id;
+                Cita.PacienteId = resultado.Data.PacienteId;
+                Cita.Fecha = resultado.Data.Fecha;
+                Cita.TratamientoId = resultado.Data.TratamientoId;
+                Cita.ProximaCita = resultado.Data.ProximaCita;
+                Cita.Observaciones = resultado.Data.Observaciones;
+                StateHasChanged();
+            }
+        }
+    }
+            
+    public async void Send()
+    {
+        var resultado = await citasManager.CreateAsync(Cita);
+        if(resultado.Succeeded) urlHelper.NavigateTo("/citas");
+    }
+}

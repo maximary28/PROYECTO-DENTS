@@ -1,0 +1,133 @@
+@page "/paciente/crear"
+@page "/paciente/editar/{Id:int}"
+<EditForm Model="@Paciente" OnValidSubmit="Send">
+<h1>@Titulo</h1>
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div class="mb-3 form-group">
+        <legend>Datos Personales:</legend>
+        <label>Nombre:</label>
+        <InputText class="form-control" @bind-Value="Paciente.Nombre"></InputText>
+        <label>Direccion:</label>
+        <InputText class="form-control" @bind-Value="Paciente.Direccion"></InputText>
+        <label>Nombre Tutor:</label>
+        <InputText class="form-control" @bind-Value="Paciente.NombreTutor"></InputText>
+        <label>Sexo:</label>
+        <InputText class="form-control" @bind-Value="Paciente.Sexo"></InputText>
+        <label>Edad:</label>
+        <InputNumber class="form-control" @bind-Value="Paciente.Edad"></InputNumber>
+        <label>Telefono:</label>
+        <InputText class="form-control" @bind-Value="Paciente.Telefono"></InputText>
+    </div>
+    
+    <div class="mb-3 form-group">
+        <legend>Complicaciones de Salud:</legend>
+        <InputCheckbox id="chk1" @bind-Value="Paciente.Fuma"/>
+        <label for="chk1">Fuma</label>
+        
+        <InputCheckbox id="chk2" @bind-Value="Paciente.PresionAlta"/>
+        <label for="chk2">Presion Alta</label>
+        
+        <InputCheckbox id="chk3" @bind-Value="Paciente.PresionBaja"/>
+        <label for="chk3">Presion Baja</label>
+        
+        <InputCheckbox id="chk4" @bind-Value="Paciente.Corazon"/>
+        <label for="chk4">Corazon</label>
+        
+        <InputCheckbox id="chk5" @bind-Value="Paciente.Diabetes"/>
+        <label for="chk5">Diabetes</label>
+        
+        <InputCheckbox id="chk6" @bind-Value="Paciente.Riñones"/>
+        <label for="chk6">Riñones</label>
+        
+        <InputCheckbox id="chk7" @bind-Value="Paciente.FiebreReumatica"/>
+        <label for="chk7">Fiebre Reumatica</label>
+        
+        <InputCheckbox id="chk8" @bind-Value="Paciente.Epilepsia"/>
+        <label for="chk8">Epilepsia</label>
+        
+        <InputCheckbox id="chk9" @bind-Value="Paciente.Asma"/>
+        <label for="chk9">Asma</label>
+        
+        <InputCheckbox id="chk10" @bind-Value="Paciente.DoloresDeCabeza"/>
+        <label for="chk10">Dolores de Cabeza</label>
+        
+        <InputCheckbox id="chk11" @bind-Value="Paciente.Falcemia"/>
+        <label for="chk11">Falcemia</label>
+        
+        <InputCheckbox id="chk12" @bind-Value="Paciente.Anemia"/>
+        <label for="chk13">Anemia</label>
+        
+        <InputCheckbox id="chk13" @bind-Value="Paciente.Hemofilia"/>
+        <label for="chk13">Hemofilia</label>
+        
+        <InputCheckbox id="chk14" @bind-Value="Paciente.Medicamento"/>
+        <label for="chk14">Medicamento</label>
+        
+        <InputCheckbox id="chk15" @bind-Value="Paciente.Embarazo"/>
+        <label for="chk15">Embarazo</label>
+        
+        <InputCheckbox id="chk16" @bind-Value="Paciente.Alergia"/>
+        <label for="chk16">Alergia</label>
+        
+        <label>Descripcion Medicamento:</label>
+        <InputText @bind-Value="Paciente.MedicamentoDescripcion"/>
+        
+        <label>Descripcion Alergia:</label>
+        <InputText @bind-Value="Paciente.AlergiaDescripcion"/>
+    </div>
+    
+    
+    <button type="submit" class="mt-2 btn btn-success  btn-with-margin">Ok</button>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+    public string Titulo => Id>0? "Editar paciente":"Crear paciente";
+
+    public PacienteUpdateRequest Paciente { get; set; } = new PacienteUpdateRequest();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(Id!=0){
+            var resultado = await pacientesManager.GetByIdAsync(Id);
+            if(resultado.Succeeded){
+                Paciente.Id = resultado.Data.Id;
+                Paciente.Nombre = resultado.Data.Nombre;
+                Paciente.Direccion = resultado.Data.Direccion;
+                Paciente.NombreTutor = resultado.Data.NombreTutor;
+                Paciente.Ocupacion = resultado.Data.Ocupacion;
+                Paciente.Sexo = resultado.Data.Sexo;
+                Paciente.Edad = resultado.Data.Edad;
+                Paciente.Telefono = resultado.Data.Telefono;
+                Paciente.Fuma = resultado.Data.Fuma;
+                Paciente.PresionAlta = resultado.Data.PresionAlta;
+                Paciente.PresionBaja = resultado.Data.PresionBaja;
+                Paciente.Corazon = resultado.Data.Corazon;
+                Paciente.Diabetes = resultado.Data.Diabetes;
+                Paciente.Riñones = resultado.Data.Riñones;
+                Paciente.FiebreReumatica = resultado.Data.FiebreReumatica;
+                Paciente.Epilepsia = resultado.Data.Epilepsia;
+                Paciente.Asma = resultado.Data.Asma;
+                Paciente.DoloresDeCabeza = resultado.Data.DoloresDeCabeza;
+                Paciente.Falcemia = resultado.Data.Falcemia;
+                Paciente.Anemia = resultado.Data.Anemia;
+                Paciente.Hemofilia = resultado.Data.Hemofilia;
+                Paciente.Medicamento = resultado.Data.Medicamento;
+                Paciente.Embarazo = resultado.Data.Embarazo;
+                Paciente.Alergia = resultado.Data.Alergia;
+                Paciente.AlergiaDescripcion = resultado.Data.AlergiaDescripcion;
+                StateHasChanged();
+            }
+        }
+    }
+            
+    public async void Send()
+    {
+        var resultado = await pacientesManager.CreateAsync(Paciente);
+        if(resultado.Succeeded) urlHelper.NavigateTo("/pacientes");
+    }
+}

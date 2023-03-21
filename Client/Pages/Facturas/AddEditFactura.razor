@@ -1,0 +1,52 @@
+@page "/factura/crear"
+@page "/factura/editar/{Id:int}"
+<EditForm Model="@Factura" OnValidSubmit="Send">
+<h1>@Titulo</h1>
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div class="form-group">
+        <label>Cita:</label>
+        <InputNumber class="form-control" @bind-Value="Factura.CitaId"></InputNumber>
+    </div>
+    <div class="form-group">
+        <label>Abonado:</label>
+        <InputNumber class="form-control" @bind-Value="Factura.Abonado"/>
+    </div>
+    <div class="form-group">
+        <label>Balance Pendiente: </label>
+        <InputNumber class="form-control" @bind-Value="Factura.BalancePendiente"/>
+    </div>
+    
+    
+    <button type="submit" class="mt-2 btn btn-success  btn-with-margin">Ok</button>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+    public string Titulo => Id>0? "Editar factura":"Crear factura";
+
+    public FacturaUpdateRequest Factura { get; set; } = new FacturaUpdateRequest();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(Id!=0){
+            var resultado = await facturasManager.GetByIdAsync(Id);
+            if(resultado.Succeeded){
+                Factura.Id = resultado.Data.Id;
+                Factura.CitaId = resultado.Data.Id;
+                Factura.Abonado = resultado.Data.Id;
+                Factura.BalancePendiente = resultado.Data.Id;
+                StateHasChanged();
+            }
+        }
+    }
+            
+    public async void Send()
+    {
+        var resultado = await facturasManager.CreateAsync(Factura);
+        if(resultado.Succeeded) urlHelper.NavigateTo("/facturas");
+    }
+}

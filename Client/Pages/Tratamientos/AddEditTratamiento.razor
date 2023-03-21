@@ -1,0 +1,52 @@
+@page "/tratamiento/crear"
+@page "/tratamiento/editar/{Id:int}"
+<EditForm Model="@Tratamiento" OnValidSubmit="Send">
+<h1>@Titulo</h1>
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div class="form-group">
+        <label>Nombre:</label>
+        <InputText class="form-control" @bind-Value="Tratamiento.Nombre"></InputText>
+    </div>
+    <div class="form-group">
+        <label>Descripcion:</label>
+        <InputText class="form-control" @bind-Value="Tratamiento.Descripcion"></InputText>
+    </div>
+    <div class="form-group">
+        <label>Precio:</label>
+        <InputNumber class="form-control" @bind-Value="Tratamiento.Precio"></InputNumber>
+    </div>
+    
+    
+    <button type="submit" class="mt-2 btn btn-success  btn-with-margin">Ok</button>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+    public string Titulo => Id>0? "Editar tratamiento":"Crear tratamiento";
+
+    public TratamientoUpdateRequest Tratamiento { get; set; } = new TratamientoUpdateRequest();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(Id!=0){
+            var resultado = await tratamientosManager.GetByIdAsync(Id);
+            if(resultado.Succeeded){
+                Tratamiento.Id = resultado.Data.Id;
+                Tratamiento.Nombre = resultado.Data.Nombre;
+                Tratamiento.Descripcion = resultado.Data.Descripcion;
+                Tratamiento.Precio = resultado.Data.Precio;
+                StateHasChanged();
+            }
+        }
+    }
+            
+    public async void Send()
+    {
+        var resultado = await tratamientosManager.CreateAsync(Tratamiento);
+        if(resultado.Succeeded) urlHelper.NavigateTo("/tratamientos");
+    }
+}
